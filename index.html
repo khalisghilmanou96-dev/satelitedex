@@ -1,0 +1,43 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SatelliteDex 🛰️</title>
+<link rel="preconnect" href="https://unpkg.com"><style>
+:root{--bg:#061316;--p:#0d2226;--p2:#123238;--txt:#efffff;--mut:#91b9bd;--a:#55f0ca;--b:#f8cf63;--line:#1d4b50}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0,#17454b 0,transparent 30%),var(--bg);color:var(--txt);font:15px system-ui,sans-serif}.wrap{max-width:1200px;margin:auto;padding:22px}
+header{display:flex;justify-content:space-between;align-items:center}.logo{font-size:27px;font-weight:1000}.logo b{color:var(--a)}.pill{border:1px solid var(--line);border-radius:99px;padding:8px 12px;color:var(--mut)}
+.hero{margin:22px 0;padding:32px;border:1px solid var(--line);border-radius:25px;background:linear-gradient(125deg,#102d32,#14515a)}h1{font-size:clamp(38px,6vw,68px);line-height:.94;margin:0}.hero p{color:var(--mut);font-size:17px;max-width:760px}
+.controls{display:flex;gap:9px;flex-wrap:wrap;margin:17px 0}select,button{padding:11px 13px;border-radius:11px;font:inherit}select{background:var(--p);color:var(--txt);border:1px solid var(--line)}button{border:0;background:var(--a);color:#042522;font-weight:900;cursor:pointer}.secondary{background:var(--p2);color:var(--txt);border:1px solid var(--line)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}.stat{background:var(--p);border:1px solid var(--line);padding:14px;border-radius:15px}.stat span{display:block;color:var(--mut)}.stat b{font-size:22px}.status{color:var(--mut);margin:10px 0}
+#map{height:510px;border-radius:20px;border:1px solid var(--line);overflow:hidden;background:#102126}.leaflet-container{background:#102126}.quick{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.quick button{background:var(--p2);border:1px solid var(--line);color:var(--txt)}.quick button:hover{color:var(--a);border-color:var(--a)}
+footer{margin-top:26px;border-top:1px solid var(--line);padding:20px 0;color:#71999d}@media(max-width:700px){.stats{grid-template-columns:1fr 1fr}.pill{display:none}#map{height:430px}}
+</style><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"></head><body><div class="wrap">
+<header><div class="logo">SATELLITE<b>DEX</b> 🛰️</div><div class="pill">CelesTrak · calcul orbital local</div></header>
+<section class="hero"><h1>Satellites<br>autour de la Terre.</h1><p>Position estimée en direct à partir des éléments orbitaux publics. Sélectionne un satellite et suis sa latitude, longitude, altitude et vitesse sur la carte.</p></section>
+<div class="quick"><button data-id="25544">ISS</button><button data-id="48274">Tiangong</button><button data-id="20580">Hubble</button><button data-id="43013">NOAA 20</button><button data-id="39084">Landsat 8</button><button data-id="49260">Landsat 9</button></div>
+<div class="controls"><select id="sat"></select><button id="refresh">Actualiser</button><button id="auto" class="secondary">Auto : ON</button></div>
+<div class="stats"><div class="stat"><span>Latitude</span><b id="lat">—</b></div><div class="stat"><span>Longitude</span><b id="lon">—</b></div><div class="stat"><span>Altitude</span><b id="alt">—</b></div><div class="stat"><span>Vitesse</span><b id="vel">—</b></div></div>
+<div id="status" class="status">Chargement des données orbitales…</div><div id="map"></div>
+<footer>SatelliteDex · données orbitales CelesTrak · carte OpenStreetMap · aucun compte N2YO requis.</footer></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="https://unpkg.com/satellite.js@5.0.0/dist/satellite.min.js"></script>
+<script>
+const sats=[
+["ISS (ZARYA)",25544],["Tiangong",48274],["Hubble Space Telescope",20580],["NOAA 20",43013],["Landsat 8",39084],["Landsat 9",49260],
+["Terra",25994],["Aqua",27424],["Suomi NPP",37849],["Sentinel-1A",39634],["Sentinel-2A",40697],["Sentinel-2B",42063],["Sentinel-3A",41335],["Sentinel-3B",43437]
+],$=s=>document.querySelector(s);sats.forEach(x=>$("#sat").insertAdjacentHTML("beforeend",`<option value="${x[1]}">${x[0]} · ${x[1]}</option>`));
+const map=L.map("map",{worldCopyJump:true}).setView([15,0],2);L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:8,attribution:"© OpenStreetMap"}).addTo(map);
+let marker=L.circleMarker([0,0],{radius:8}).addTo(map),trail=L.polyline([]).addTo(map),satrec=null,trailPts=[],auto=true;
+async function loadTLE(){
+ const id=$("#sat").value;$("#status").textContent="Récupération des éléments orbitaux CelesTrak…";
+ try{const r=await fetch(`https://celestrak.org/NORAD/elements/gp.php?CATNR=${id}&FORMAT=TLE`);if(!r.ok)throw Error(r.status);const t=(await r.text()).trim().split(/\r?\n/);if(t.length<3)throw Error("TLE");satrec=satellite.twoline2satrec(t[t.length-2],t[t.length-1]);trailPts=[];update();$("#status").textContent=`${t[0]} · données orbitales chargées`;}
+ catch(e){$("#status").textContent="Impossible de récupérer les données orbitales pour le moment."}
+}
+function update(){
+ if(!satrec)return;const now=new Date(),pv=satellite.propagate(satrec,now);if(!pv.position)return;
+ const gmst=satellite.gstime(now),gd=satellite.eciToGeodetic(pv.position,gmst),lat=satellite.degreesLat(gd.latitude),lon=satellite.degreesLong(gd.longitude),alt=gd.height;
+ const v=pv.velocity?Math.sqrt(pv.velocity.x**2+pv.velocity.y**2+pv.velocity.z**2)*3600:0;
+ $("#lat").textContent=lat.toFixed(3)+"°";$("#lon").textContent=lon.toFixed(3)+"°";$("#alt").textContent=alt.toFixed(0)+" km";$("#vel").textContent=v.toLocaleString("fr-FR",{maximumFractionDigits:0})+" km/h";
+ marker.setLatLng([lat,lon]).bindPopup($("#sat").selectedOptions[0].text).openPopup();trailPts.push([lat,lon]);if(trailPts.length>120)trailPts.shift();trail.setLatLngs(trailPts);
+}
+$("#sat").onchange=loadTLE;$("#refresh").onclick=loadTLE;$("#auto").onclick=()=>{auto=!auto;$("#auto").textContent="Auto : "+(auto?"ON":"OFF")};
+document.querySelectorAll(".quick button").forEach(b=>b.onclick=()=>{$("#sat").value=b.dataset.id;loadTLE()});
+setInterval(()=>{if(auto)update()},3000);loadTLE();
+</script></body></html>
