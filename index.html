@@ -8,14 +8,51 @@ header{display:flex;justify-content:space-between;align-items:center}.logo{font-
 .controls{display:flex;gap:9px;flex-wrap:wrap;margin:17px 0}select,button{padding:11px 13px;border-radius:11px;font:inherit}select{background:var(--p);color:var(--txt);border:1px solid var(--line)}button{border:0;background:var(--a);color:#042522;font-weight:900;cursor:pointer}.secondary{background:var(--p2);color:var(--txt);border:1px solid var(--line)}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}.stat{background:var(--p);border:1px solid var(--line);padding:14px;border-radius:15px}.stat span{display:block;color:var(--mut)}.stat b{font-size:22px}.status{color:var(--mut);margin:10px 0}
 #map{height:510px;border-radius:20px;border:1px solid var(--line);overflow:hidden;background:#102126}.leaflet-container{background:#102126}.quick{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.quick button{background:var(--p2);border:1px solid var(--line);color:var(--txt)}.quick button:hover{color:var(--a);border-color:var(--a)}
-footer{margin-top:26px;border-top:1px solid var(--line);padding:20px 0;color:#71999d}@media(max-width:700px){.stats{grid-template-columns:1fr 1fr}.pill{display:none}#map{height:430px}}
+footer{margin-top:26px;border-top:1px solid var(--line);padding:20px 0;color:#71999d}
+.ad-zone{width:100%;display:flex;justify-content:center;align-items:center;margin:30px auto;overflow:hidden}.ad-desktop{display:block;max-width:728px}.ad-mobile{display:none;max-width:320px}.ad-square{min-height:250px}
+@media(max-width:700px){.stats{grid-template-columns:1fr 1fr}.pill{display:none}#map{height:430px}}@media(max-width:900px){.ad-desktop{display:none}.ad-mobile{display:block}}
 </style><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"></head><body><div class="wrap">
 <header><div class="logo">SATELLITE<b>DEX</b> 🛰️</div><div class="pill">CelesTrak · calcul orbital local</div></header>
 <section class="hero"><h1>Satellites<br>autour de la Terre.</h1><p>Position estimée en direct à partir des éléments orbitaux publics. Sélectionne un satellite et suis sa latitude, longitude, altitude et vitesse sur la carte.</p></section>
+
+<section class="ad-zone" aria-label="Publicité">
+  <div class="ad-desktop">
+    <script>atOptions={'key':'fd0208f8294295037bd9dc14cb65fb5f','format':'iframe','height':90,'width':728,'params':{}};</script>
+    <script src="https://www.highrevenueformat.com/fd0208f8294295037bd9dc14cb65fb5f/invoke.js"></script>
+  </div>
+  <div class="ad-mobile">
+    <script>atOptions={'key':'d71170ffb40b57a465d29a665fee8524','format':'iframe','height':50,'width':320,'params':{}};</script>
+    <script src="https://www.highrevenueformat.com/d71170ffb40b57a465d29a665fee8524/invoke.js"></script>
+  </div>
+</section>
+
 <div class="quick"><button data-id="25544">ISS</button><button data-id="48274">Tiangong</button><button data-id="20580">Hubble</button><button data-id="43013">NOAA 20</button><button data-id="39084">Landsat 8</button><button data-id="49260">Landsat 9</button></div>
 <div class="controls"><select id="sat"></select><button id="refresh">Actualiser</button><button id="auto" class="secondary">Auto : ON</button></div>
+
+<section class="ad-zone ad-square" aria-label="Publicité">
+  <script>atOptions={'key':'59fb85ef559885982762e5f7cfa6bd9b','format':'iframe','height':250,'width':300,'params':{}};</script>
+  <script src="https://www.highrevenueformat.com/59fb85ef559885982762e5f7cfa6bd9b/invoke.js"></script>
+</section>
+
 <div class="stats"><div class="stat"><span>Latitude</span><b id="lat">—</b></div><div class="stat"><span>Longitude</span><b id="lon">—</b></div><div class="stat"><span>Altitude</span><b id="alt">—</b></div><div class="stat"><span>Vitesse</span><b id="vel">—</b></div></div>
 <div id="status" class="status">Chargement des données orbitales…</div><div id="map"></div>
+
+<section class="ad-zone ad-square" aria-label="Publicité">
+  <script>atOptions={'key':'59fb85ef559885982762e5f7cfa6bd9b','format':'iframe','height':250,'width':300,'params':{}};</script>
+  <script src="https://www.highrevenueformat.com/59fb85ef559885982762e5f7cfa6bd9b/invoke.js"></script>
+</section>
+
+<section class="ad-zone" aria-label="Publicité">
+  <div class="ad-desktop">
+    <script>atOptions={'key':'fd0208f8294295037bd9dc14cb65fb5f','format':'iframe','height':90,'width':728,'params':{}};</script>
+    <script src="https://www.highrevenueformat.com/fd0208f8294295037bd9dc14cb65fb5f/invoke.js"></script>
+  </div>
+  <div class="ad-mobile">
+    <script>atOptions={'key':'d71170ffb40b57a465d29a665fee8524','format':'iframe','height':50,'width':320,'params':{}};</script>
+    <script src="https://www.highrevenueformat.com/d71170ffb40b57a465d29a665fee8524/invoke.js"></script>
+  </div>
+</section>
+
 <footer>SatelliteDex · données orbitales CelesTrak · carte OpenStreetMap · aucun compte N2YO requis.</footer></div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="https://unpkg.com/satellite.js@5.0.0/dist/satellite.min.js"></script>
 <script>
